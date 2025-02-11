@@ -19,14 +19,14 @@ enum JsonValue:
    }
 
 case class Parser[A](runParser: String => Option[(String, A)]) {
-  // Functor: map
+  // Functor: map, applique une fonction A => B au resultat d'un parseur
   def map[B](f: A => B): Parser[B] = Parser { input =>
     runParser(input).map {
       case (rest, value) => (rest, f(value))
     }
   }
 
-  // Monad: flatMap (necessaire pour que le Parser soit un Monad)
+  // Monad: flatMap (necessaire pour que le Parser soit un Monad) // A monad is just a monoid in the category of endofunctors. duh
   def flatMap[B](f: A => Parser[B]): Parser[B] = Parser { input =>
     runParser(input).flatMap {
       case (rest, value) => f(value).runParser(rest)
